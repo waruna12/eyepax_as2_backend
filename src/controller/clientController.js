@@ -51,7 +51,6 @@ module.exports.getall = async function (req, res) {
 
 module.exports.get = async function (req, res) {
   const { id } = req.params;
-  // console.log("---PARAM", id);
 
   const resp = await clientModel.findById(id);
 
