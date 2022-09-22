@@ -25,11 +25,3 @@ dbConnection();
 server.listen(3000, function () {
   console.log("server stated on port 3000 - new line");
 });
-
-// server.get("/" , function(req,res){
-//     res.send("Hello waruna");
-// })
-
-// server.post("/" , function(req,res){
-//    console.log('INPUT' , req.body);
-// })

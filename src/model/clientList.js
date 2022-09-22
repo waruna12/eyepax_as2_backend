@@ -7,19 +7,22 @@ const clientList = mongoose.model(
       //table name"client"
       fname: {
         type: String,
-        required: true,
+        required: [true, "First name is required "],
       },
       lname: {
         type: String,
-        required: true,
+        required: [true, "Last name is required "],
       },
       phone_number: {
         type: String,
-        required: true,
+        required: [true, "Phone number is required "],
       },
       email: {
         type: String,
-        required: true,
+        required: [true, "Email is required "],
+        index: {
+          unique: true,
+        },
       },
     },
     { timestamps: true }

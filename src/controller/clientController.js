@@ -1,34 +1,68 @@
 const clientModel = require("../model/clientList");
 const reservationModel = require("../model/reservationList");
 
+// module.exports.create = async function (req, res) {
+//   const { fname, lname, phone_number, email } = req.body;
+
+//   try {
+//     const client = await clientModel.findOne({ email: email });
+
+//     if (!client) {
+//       const resp = await clientModel.create({
+//         fname,
+//         lname,
+//         phone_number,
+//         email,
+//       });
+
+//       res.send({
+//         success: true,
+//         data: resp,
+//       });
+//     } else {
+//       const error = new Error("Email alredy registered");
+//       error.statusCode = 401;
+//       throw error;
+//     }
+//   } catch (e) {
+//     res.send({
+//       success: false,
+//       error: e,
+//     });
+//   }
+// };
+
 module.exports.create = async function (req, res) {
   const { fname, lname, phone_number, email } = req.body;
 
   try {
-    const client = await clientModel.findOne({ email: email });
+    const resp = await clientModel.create({
+      fname,
+      lname,
+      phone_number,
+      email,
+    });
 
-    if (!client) {
-      const resp = await clientModel.create({
-        fname,
-        lname,
-        phone_number,
-        email,
-      });
-
-      res.send({
-        success: true,
-        data: resp,
-      });
-    } else {
-      const error = new Error("Email alredy registered");
-      error.statusCode = 401;
-      throw error;
-    }
+    res.status(201).send({
+      success: true,
+      data: resp,
+    });
   } catch (e) {
-    console.log("Error ----------- ", e);
-    res.send({
+    let errors = {};
+    const allErrors = e.message.substring(e.message.indexOf(":") + 1).trim();
+    const allErrorsInArrayFormat = allErrors
+      .split(",")
+      .map((err) => err.trim());
+    allErrorsInArrayFormat.forEach((error) => {
+      const [key, value] = error.split(":").map((err) => err.trim());
+      errors[key] = value;
+    });
+
+    res.status(400).send({
       success: false,
-      error: e,
+      message: "Validation failed",
+      case: "VALIDATION_ERROR",
+      error: errors,
     });
   }
 };
@@ -69,24 +103,41 @@ module.exports.get = async function (req, res) {
 
 module.exports.update = async function (req, res) {
   const { id } = req.params;
+  const { client_email } = req.params;
 
   const { fname, lname, phone_number, email } = req.body;
 
-  const resp = await clientModel.findById(id);
+  try {
+    const reservationClient = await reservationModel.findOne({
+      client_email: client_email,
+    });
 
-  console.log(resp);
+    if (!reservationClient) {
+      const resp = await clientModel.findById(id);
 
-  if (resp) {
-    resp.fname = fname;
-    resp.lname = lname;
-    resp.phone_number = phone_number;
-    resp.email = email;
+      if (resp) {
+        resp.fname = fname;
+        resp.lname = lname;
+        resp.phone_number = phone_number;
+        resp.email = email;
 
-    await resp.save();
+        await resp.save();
 
+        res.send({
+          success: true,
+          data: resp,
+        });
+      }
+    } else {
+      res.send({
+        success: false,
+        data: [],
+      });
+    }
+  } catch (e) {
     res.send({
-      success: true,
-      data: resp,
+      success: false,
+      error: e,
     });
   }
 };
@@ -96,11 +147,11 @@ module.exports.delete = async function (req, res) {
   const { email } = req.body;
 
   try {
-    const reservation_client = await reservationModel.findOne({
+    const reservationClient = await reservationModel.findOne({
       client_email: email,
     });
 
-    if (!reservation_client) {
+    if (!reservationClient) {
       const resp = await clientModel.deleteOne({ _id });
 
       res.send({
@@ -115,7 +166,6 @@ module.exports.delete = async function (req, res) {
       throw error;
     }
   } catch (e) {
-    console.log("Error ----------- ", e);
     res.send({
       success: false,
       error: e,
@@ -125,17 +175,16 @@ module.exports.delete = async function (req, res) {
 
 module.exports.search = async function (req, res) {
   const { key } = req.params;
-  // console.log(req.params.key);
+
   try {
-    const client_search = await clientModel.find({
+    const clientSearch = await clientModel.find({
       $or: [{ fname: { $regex: key } }, { email: { $regex: key } }],
     });
 
-    // res.send("serch done");
-    if (client_search) {
+    if (clientSearch) {
       res.send({
         success: true,
-        data: client_search,
+        data: clientSearch,
       });
     } else {
       res.send({
@@ -144,6 +193,6 @@ module.exports.search = async function (req, res) {
       });
     }
   } catch (e) {
-    res.send("serch faeild");
+    res.send("Search failed");
   }
 };

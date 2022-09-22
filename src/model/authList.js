@@ -24,6 +24,7 @@ const userList = mongoose.model(
       email: {
         type: String,
         required: true,
+        unique: true,
       },
     },
     { timestamps: true }

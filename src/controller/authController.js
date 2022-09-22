@@ -8,14 +8,11 @@ module.exports.signup = async function (req, res) {
   const { fname, lname, type, email, password } = req.body;
 
   try {
-    const token1 = req.params.token;
+    const tempToken = req.params.token;
+    const tempUserResult = await tempUser.findOne({ token: tempToken });
 
-    const tempuser = await tempUser.findOne({ token: token1 });
-
-    if (tempuser) {
-      //passs encript
+    if (tempUserResult) {
       const hashedPw = await bcrypt.hash(password, 12);
-
       const result = await authList.create({
         fname,
         lname,
@@ -23,8 +20,6 @@ module.exports.signup = async function (req, res) {
         email,
         password: hashedPw,
       });
-
-      //token genarate
 
       const token = jwt.sign(
         {
@@ -36,20 +31,17 @@ module.exports.signup = async function (req, res) {
         { expiresIn: "1h" }
       );
 
-      //send token front-end
       res.send({
         success: true,
         data: { usetId: result._id, token },
       });
     } else {
-      console.log("Token is not there -----------", e);
       res.send({
         success: false,
         error: e,
       });
     }
   } catch (e) {
-    console.log("Error ----------- ", e);
     res.send({
       success: false,
       error: e,
@@ -92,7 +84,6 @@ module.exports.login = async function (req, res) {
       data: { usetId: user._id, token },
     });
   } catch (e) {
-    console.log("Error ----------- ", e);
     res.send({
       success: false,
       error: e,
@@ -118,10 +109,9 @@ module.exports.getall = async function (req, res) {
 
 module.exports.inviteUser = async function (req, res) {
   const email = req.params.email;
+  const tempUserResult = await tempUser.findOne({ email: email });
 
-  const tempuser = await tempUser.findOne({ email: email });
-
-  if (!tempuser) {
+  if (!tempUserResult) {
     const token = jwt.sign(
       {
         email,
@@ -143,7 +133,6 @@ module.exports.inviteUser = async function (req, res) {
         data: resp,
       });
     } catch (e) {
-      console.log("Error ----------- ", e);
       res.send({
         success: false,
         error: e,
@@ -153,6 +142,25 @@ module.exports.inviteUser = async function (req, res) {
     res.send({
       success: false,
       // error: e,
+    });
+  }
+};
+
+module.exports.update = async function (req, res) {
+  const { id } = req.params;
+  const { newPassword } = req.params;
+
+  const resp = await authList.findById(id);
+
+  const hashedPw = await bcrypt.hash(newPassword, 12);
+
+  if (resp) {
+    resp.password = hashedPw;
+    await resp.save();
+
+    res.send({
+      success: true,
+      data: resp,
     });
   }
 };

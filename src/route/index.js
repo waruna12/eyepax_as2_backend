@@ -44,6 +44,10 @@ router.get("/invite-user/:email", async function (req, res) {
   await signupController.inviteUser(req, res);
 });
 
+router.put("/user/:id/:newPassword", async function (req, res) {
+  await signupController.update(req, res);
+});
+
 //client route
 router.post("/client", async function (req, res) {
   await clientController.create(req, res);
@@ -57,7 +61,7 @@ router.get("/client/:id", async function (req, res) {
   await clientController.get(req, res);
 });
 
-router.put("/client/:id", async function (req, res) {
+router.put("/client/:id/:client_email", async function (req, res) {
   await clientController.update(req, res);
 });
 
@@ -106,6 +110,13 @@ router.get("/reservation/find/:key", async function (req, res) {
 router.get("/reservations/stylist", async function (req, res) {
   await reservationController.eachStylistReservation(req, res);
 });
+
+router.put(
+  "/drag_reservation/:id/:date/:time/:email",
+  async function (req, res) {
+    await reservationController.updateDragReservation(req, res);
+  }
+);
 
 //use anyware export
 module.exports = router;

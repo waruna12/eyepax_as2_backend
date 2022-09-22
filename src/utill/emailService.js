@@ -1,6 +1,3 @@
-// import { response } from "express";
-// var file = require('logo.png');
-
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const response = require("express");
@@ -11,24 +8,13 @@ module.exports.sendEmail = async function (email, token) {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: "rmsliit12@outlook.com", // generated ethereal user smyp
-      pass: "rmssliit12", // generated ethereal password
+      user: process.env.EMAIL, // generated ethereal user smyp
+      pass: process.env.PASSWORD, // generated ethereal password
     },
   });
 
-  // verify connection configuration
-  // transporter.verify(function (error, success) {
-  //   if (error) {
-  //     console.log(error);
-  //   } else {
-  //     console.log("Server is ready to take our messages");
-  //   }
-  // });
-
-  // send mail with defined transport object
   let info = await transporter.sendMail({
-    //  from: "weehenaerp@outlook.com", // sender address
-    from: "rmsliit12@outlook.com",
+    from: process.env.EMAIL,
     to: email, // list of receivers
     subject: "Reset Your Password",
     html: `<!DOCTYPE html>
@@ -488,10 +474,3 @@ module.exports.sendEmail = async function (email, token) {
 `,
   });
 };
-
-// <img src=${`https://storage.googleapis.com/weehena-storage-bucket1/logo/logo.png`} alt="logo" style="display: block;
-//   margin-top: -20px;
-//   margin-bottom: -30px;
-//   margin-left: auto;
-//   margin-right: auto;"
-// />

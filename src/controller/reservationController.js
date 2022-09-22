@@ -13,22 +13,36 @@ module.exports.create = async function (req, res) {
   } = req.body;
 
   try {
-    const resp = await reservationModel.create({
-      client_email,
-      service_type,
-      stylist_email,
-      reservation_date,
-      reservation_time,
-      reservation_status,
-      reservation_count,
+    const reservationDuplicate = await reservationModel.find({
+      $and: [
+        { client_email: { $regex: client_email } },
+        { service_type: { $regex: service_type } },
+        { reservation_date: { $regex: reservation_date } },
+      ],
     });
 
-    res.send({
-      success: true,
-      data: resp,
-    });
+    if (reservationDuplicate.length === 0) {
+      const resp = await reservationModel.create({
+        client_email,
+        service_type,
+        stylist_email,
+        reservation_date,
+        reservation_time,
+        reservation_status,
+        reservation_count,
+      });
+
+      res.send({
+        success: true,
+        data: resp,
+      });
+    } else {
+      res.send({
+        success: false,
+        data: [],
+      });
+    }
   } catch (e) {
-    console.log("Error ----------- ", e);
     res.send({
       success: false,
       error: e,
@@ -54,8 +68,6 @@ module.exports.getall = async function (req, res) {
 
 module.exports.get = async function (req, res) {
   const { id } = req.params;
-  // console.log("---PARAM", id);
-
   const resp = await reservationModel.findById(id);
 
   if (resp) {
@@ -119,14 +131,14 @@ module.exports.delete = async function (req, res) {
 module.exports.reservationSearch = async function (req, res) {
   const { key } = req.params;
   try {
-    const reservation_search = await reservationModel.find({
+    const reservationSearch = await reservationModel.find({
       $or: [{ client_email: { $regex: key } }],
     });
 
-    if (reservation_search) {
+    if (reservationSearch) {
       res.send({
         success: true,
-        data: reservation_search,
+        data: reservationSearch,
       });
     } else {
       res.send({
@@ -135,7 +147,7 @@ module.exports.reservationSearch = async function (req, res) {
       });
     }
   } catch (e) {
-    res.send("search failed");
+    res.send("Search failed");
   }
 };
 
@@ -146,27 +158,27 @@ module.exports.search = async function (req, res) {
   const users = [];
 
   try {
-    const stylist_search = await reservationModel.find({
+    const stylistSearch = await reservationModel.find({
       $and: [
         { reservation_date: { $regex: date } },
         { reservation_time: { $regex: time } },
       ],
     });
 
-    stylist_search.map((x) => {
+    stylistSearch.map((x) => {
       styalist.push(x.stylist_email);
     });
 
-    const user_search = await authList.find();
+    const userSearch = await authList.find();
 
-    user_search.map((x) => {
+    userSearch.map((x) => {
       users.push(x.email);
     });
 
-    let unique1 = styalist.filter((o) => users.indexOf(o) === -1);
-    let unique2 = users.filter((o) => styalist.indexOf(o) === -1);
+    let uniqueOne = styalist.filter((o) => users.indexOf(o) === -1);
+    let uniqueTwo = users.filter((o) => styalist.indexOf(o) === -1);
 
-    const unique = unique1.concat(unique2);
+    const unique = uniqueOne.concat(uniqueTwo);
 
     if (unique) {
       res.send({
@@ -187,14 +199,14 @@ module.exports.search = async function (req, res) {
 module.exports.completeReservation = async function (req, res) {
   const { key } = req.params;
   try {
-    const complete_reservation = await reservationModel.find({
+    const completeReservation = await reservationModel.find({
       $or: [{ reservation_status: { $regex: key } }],
     });
 
-    if (complete_reservation) {
+    if (completeReservation) {
       res.send({
         success: true,
-        data: complete_reservation,
+        data: completeReservation,
       });
     } else {
       res.send({
@@ -225,5 +237,49 @@ module.exports.eachStylistReservation = async function (req, res) {
       success: false,
       data: [],
     });
+  }
+};
+
+module.exports.updateDragReservation = async function (req, res) {
+  const { id } = req.params;
+  const { date } = req.params;
+  const { time } = req.params;
+  const { email } = req.params;
+
+  const { client_email, service_type, reservation_status, reservation_count } =
+    req.body;
+
+  const availble_reservation = await reservationModel.find({
+    $and: [
+      { reservation_date: { $regex: date } },
+      { reservation_time: { $regex: time } },
+      { stylist_email: { $regex: email } },
+    ],
+  });
+
+  if (availble_reservation.length > 0) {
+    res.send({
+      success: false,
+      data: [],
+    });
+  } else {
+    const resp = await reservationModel.findById(id);
+
+    if (resp) {
+      resp.client_email = client_email;
+      resp.service_type = service_type;
+      resp.stylist_email = email;
+      resp.reservation_date = date;
+      resp.reservation_time = time;
+      resp.reservation_status = reservation_status;
+      resp.reservation_count = reservation_count;
+
+      await resp.save();
+
+      res.send({
+        success: true,
+        data: resp,
+      });
+    }
   }
 };
