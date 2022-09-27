@@ -1,0 +1,6 @@
+projectKey=Eyepax_Assessment2_Backend
+serverUrl=http://localhost:9000
+serverVersion=9.6.1.59531
+dashboardUrl=http://localhost:9000/dashboard?id=Eyepax_Assessment2_Backend
+ceTaskId=AYN4tDyEOv9be8J4TYZ3
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYN4tDyEOv9be8J4TYZ3

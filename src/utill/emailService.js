@@ -13,7 +13,7 @@ module.exports.sendEmail = async function (email, token) {
     },
   });
 
-  let info = await transporter.sendMail({
+  await transporter.sendMail({
     from: process.env.EMAIL,
     to: email, // list of receivers
     subject: "Reset Your Password",

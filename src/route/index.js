@@ -1,32 +1,9 @@
 const express = require("express");
-const todoController = require("../controller/todoController");
 const clientController = require("../controller/clientController");
 const reservationController = require("../controller/reservationController");
 const signupController = require("../controller/authController");
 
 const router = express.Router();
-
-router.post("/todo", async function (req, res) {
-  console.log("--PAYLOAD", req.body);
-  //call the fuction and logic there
-  await todoController.create(req, res);
-});
-
-router.get("/todo", async function (req, res) {
-  await todoController.getall(req, res);
-});
-
-router.get("/todo/:id", async function (req, res) {
-  await todoController.get(req, res);
-});
-router.put("/todo/:id", async function (req, res) {
-  await todoController.update(req, res);
-});
-router.delete("/todo/:id", async function (req, res) {
-  await todoController.delete(req, res);
-});
-
-///////////////
 
 router.post("/signup/:token", async function (req, res) {
   await signupController.signup(req, res);

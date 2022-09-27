@@ -4,7 +4,6 @@ const reservationList = mongoose.model(
   "reservation",
   new mongoose.Schema(
     {
-      //table name"client"
       client_email: {
         type: String,
         required: true,

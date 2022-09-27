@@ -1,36 +1,6 @@
 const clientModel = require("../model/clientList");
 const reservationModel = require("../model/reservationList");
-
-// module.exports.create = async function (req, res) {
-//   const { fname, lname, phone_number, email } = req.body;
-
-//   try {
-//     const client = await clientModel.findOne({ email: email });
-
-//     if (!client) {
-//       const resp = await clientModel.create({
-//         fname,
-//         lname,
-//         phone_number,
-//         email,
-//       });
-
-//       res.send({
-//         success: true,
-//         data: resp,
-//       });
-//     } else {
-//       const error = new Error("Email alredy registered");
-//       error.statusCode = 401;
-//       throw error;
-//     }
-//   } catch (e) {
-//     res.send({
-//       success: false,
-//       error: e,
-//     });
-//   }
-// };
+const errorHandler = require("../utill/errorHandler");
 
 module.exports.create = async function (req, res) {
   const { fname, lname, phone_number, email } = req.body;
@@ -42,43 +12,35 @@ module.exports.create = async function (req, res) {
       phone_number,
       email,
     });
-
     res.status(201).send({
       success: true,
+      message: "Client create success",
       data: resp,
     });
   } catch (e) {
-    let errors = {};
-    const allErrors = e.message.substring(e.message.indexOf(":") + 1).trim();
-    const allErrorsInArrayFormat = allErrors
-      .split(",")
-      .map((err) => err.trim());
-    allErrorsInArrayFormat.forEach((error) => {
-      const [key, value] = error.split(":").map((err) => err.trim());
-      errors[key] = value;
-    });
-
-    res.status(400).send({
+    const error = await errorHandler.validationError(e);
+    res.status(500).send({
       success: false,
       message: "Validation failed",
       case: "VALIDATION_ERROR",
-      error: errors,
+      error: error,
     });
   }
 };
 
 module.exports.getall = async function (req, res) {
-  const resp = await clientModel.find();
+  try {
+    const resp = await clientModel.find();
 
-  if (resp) {
-    res.send({
+    res.status(200).send({
       success: true,
+      message: "Get all clients success",
       data: resp,
     });
-  } else {
-    res.send({
+  } catch (e) {
+    res.status(500).send({
       success: false,
-      data: [],
+      error: e,
     });
   }
 };
@@ -86,17 +48,24 @@ module.exports.getall = async function (req, res) {
 module.exports.get = async function (req, res) {
   const { id } = req.params;
 
-  const resp = await clientModel.findById(id);
-
-  if (resp) {
-    res.send({
-      success: true,
-      data: resp,
-    });
-  } else {
-    res.send({
+  try {
+    const resp = await clientModel.findById(id);
+    if (resp) {
+      res.status(200).send({
+        success: true,
+        message: "Get client success",
+        data: resp,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "No valid entry found for provided ID",
+      });
+    }
+  } catch (e) {
+    res.status(500).send({
       success: false,
-      data: [],
+      error: e,
     });
   }
 };
@@ -123,21 +92,26 @@ module.exports.update = async function (req, res) {
 
         await resp.save();
 
-        res.send({
+        res.status(200).send({
           success: true,
+          message: "Client update success",
           data: resp,
         });
       }
     } else {
-      res.send({
+      res.status(401).send({
         success: false,
-        data: [],
+        message: "Cannot update, Already have an appointment",
+        error: "Can not update",
       });
     }
   } catch (e) {
-    res.send({
+    const error = await errorHandler.validationError(e);
+    res.status(500).send({
       success: false,
-      error: e,
+      message: "Validation failed",
+      case: "VALIDATION_ERROR",
+      error: error,
     });
   }
 };
@@ -147,26 +121,43 @@ module.exports.delete = async function (req, res) {
   const { email } = req.body;
 
   try {
-    const reservationClient = await reservationModel.findOne({
-      client_email: email,
-    });
-
-    if (!reservationClient) {
-      const resp = await clientModel.deleteOne({ _id });
-
-      res.send({
-        success: true,
-        data: {
-          id: _id,
-        },
+    if (email) {
+      const reservationClient = await reservationModel.findOne({
+        client_email: email,
       });
+      if (!reservationClient) {
+        const resp = await clientModel.deleteOne({ _id });
+
+        if (resp.deletedCount > 0) {
+          res.status(200).send({
+            success: true,
+            message: "Client delete success",
+            data: {
+              id: _id,
+            },
+          });
+        } else {
+          res.status(404).send({
+            success: false,
+            message: "No valid entry found for provided ID",
+          });
+        }
+      } else {
+        res.status(401).send({
+          success: false,
+          message: "Cannot delete, Already have an appointment",
+          error: "Can not delete",
+        });
+      }
     } else {
-      const error = new Error("Cannot delete, Already have an appointment");
-      error.statusCode = 401;
-      throw error;
+      res.status(500).send({
+        success: false,
+        message: "Email is required",
+        error: "Email is required",
+      });
     }
   } catch (e) {
-    res.send({
+    res.status(500).send({
       success: false,
       error: e,
     });
@@ -182,17 +173,21 @@ module.exports.search = async function (req, res) {
     });
 
     if (clientSearch) {
-      res.send({
+      res.status(200).send({
         success: true,
         data: clientSearch,
       });
     } else {
-      res.send({
+      res.status(401).send({
         success: false,
-        data: [],
+        message: "Cannot search",
+        error: "Can not search",
       });
     }
   } catch (e) {
-    res.send("Search failed");
+    res.status(500).send({
+      success: false,
+      error: e,
+    });
   }
 };

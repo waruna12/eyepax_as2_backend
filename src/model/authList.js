@@ -4,27 +4,26 @@ const userList = mongoose.model(
   "user",
   new mongoose.Schema(
     {
-      //table name"client"
       fname: {
         type: String,
-        required: true,
+        required: [true, "First name is required"],
       },
       lname: {
         type: String,
-        required: true,
+        required: [true, "Last name is required"],
       },
       type: {
         type: String,
-        required: true,
+        required: [true, "User type is required"],
       },
       password: {
         type: String,
-        required: true,
+        required: [true, "Password is required"],
       },
       email: {
         type: String,
-        required: true,
         unique: true,
+        required: [true, "Email is required"],
       },
     },
     { timestamps: true }

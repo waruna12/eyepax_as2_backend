@@ -3,12 +3,61 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const emailService = require("../utill/emailService");
 const tempUser = require("../model/tempUser");
+const errorHandler = require("../utill/errorHandler");
+
+// module.exports.signup = async function (req, res) {
+//   const { fname, lname, type, email, password } = req.body;
+
+//   const tempToken = req.params.token;
+
+//   try {
+//     const tempUserResult = await tempUser.findOne({ token: tempToken });
+
+//     if (tempUserResult) {
+//       const hashedPw = await bcrypt.hash(password, 12);
+//       const result = await authList.create({
+//         fname,
+//         lname,
+//         type,
+//         email,
+//         password: hashedPw,
+//       });
+
+//       const token = jwt.sign(
+//         {
+//           email,
+//           type,
+//           usetId: result._id,
+//         },
+//         "somesupersecretsecret",
+//         { expiresIn: "1h" }
+//       );
+
+//       res.status(200).send({
+//         success: true,
+//         data: { usetId: result._id, token },
+//       });
+//     } else {
+//       res.status(500).send({
+//         success: false,
+//         error: "",
+//       });
+//     }
+//   } catch (e) {
+//     console.log(e);
+//     res.status(500).send({
+//       success: false,
+//       error: e,
+//     });
+//   }
+// };
 
 module.exports.signup = async function (req, res) {
   const { fname, lname, type, email, password } = req.body;
 
+  const tempToken = req.params.token;
+
   try {
-    const tempToken = req.params.token;
     const tempUserResult = await tempUser.findOne({ token: tempToken });
 
     if (tempUserResult) {
@@ -31,20 +80,25 @@ module.exports.signup = async function (req, res) {
         { expiresIn: "1h" }
       );
 
-      res.send({
+      res.status(200).send({
         success: true,
+        message: "Create new user",
         data: { usetId: result._id, token },
       });
     } else {
-      res.send({
+      res.status(500).send({
         success: false,
-        error: e,
+        message: "Invalid token",
+        error: "Invalid token",
       });
     }
   } catch (e) {
-    res.send({
+    const error = await errorHandler.validationError(e);
+    res.status(500).send({
       success: false,
-      error: e,
+      message: "Validation failed",
+      case: "VALIDATION_ERROR",
+      error: error,
     });
   }
 };
@@ -68,7 +122,6 @@ module.exports.login = async function (req, res) {
       throw error;
     }
 
-    //cret token
     const token = jwt.sign(
       {
         email,
@@ -79,12 +132,12 @@ module.exports.login = async function (req, res) {
       { expiresIn: "1h" }
     );
 
-    res.send({
+    res.status(200).send({
       success: true,
       data: { usetId: user._id, token },
     });
   } catch (e) {
-    res.send({
+    res.status(500).send({
       success: false,
       error: e,
     });
@@ -95,12 +148,12 @@ module.exports.getall = async function (req, res) {
   const resp = await authList.find();
 
   if (resp) {
-    res.send({
+    res.status(200).send({
       success: true,
       data: resp,
     });
   } else {
-    res.send({
+    res.status(500).send({
       success: false,
       data: [],
     });
@@ -120,7 +173,7 @@ module.exports.inviteUser = async function (req, res) {
       { expiresIn: "1h" }
     );
 
-    const sendEmail = await emailService.sendEmail(email, token);
+    await emailService.sendEmail(email, token);
 
     try {
       const resp = await tempUser.create({

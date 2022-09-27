@@ -118,14 +118,29 @@ module.exports.update = async function (req, res) {
 module.exports.delete = async function (req, res) {
   const { id: _id } = req.params;
 
-  const resp = await reservationModel.deleteOne({ _id });
+  try {
+    const resp = await reservationModel.deleteOne({ _id });
 
-  res.send({
-    success: true,
-    data: {
-      id: _id,
-    },
-  });
+    if (resp.deletedCount > 0) {
+      res.status(200).send({
+        success: true,
+        message: "Reservation delete success",
+        data: {
+          id: _id,
+        },
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "No valid entry found for provided ID",
+      });
+    }
+  } catch (e) {
+    res.status(500).send({
+      success: false,
+      error: e,
+    });
+  }
 };
 
 module.exports.reservationSearch = async function (req, res) {
@@ -165,13 +180,13 @@ module.exports.search = async function (req, res) {
       ],
     });
 
-    stylistSearch.map((x) => {
+    stylistSearch.forEach((x) => {
       styalist.push(x.stylist_email);
     });
 
     const userSearch = await authList.find();
 
-    userSearch.map((x) => {
+    userSearch.forEach((x) => {
       users.push(x.email);
     });
 

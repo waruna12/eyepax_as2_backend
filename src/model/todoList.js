@@ -6,7 +6,6 @@ const todoList = mongoose.model(
   "todos",
   new mongoose.Schema(
     {
-      //table name"todo"
       title: {
         type: String,
         required: true,
