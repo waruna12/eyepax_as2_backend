@@ -5,53 +5,6 @@ const emailService = require("../utill/emailService");
 const tempUser = require("../model/tempUser");
 const errorHandler = require("../utill/errorHandler");
 
-// module.exports.signup = async function (req, res) {
-//   const { fname, lname, type, email, password } = req.body;
-
-//   const tempToken = req.params.token;
-
-//   try {
-//     const tempUserResult = await tempUser.findOne({ token: tempToken });
-
-//     if (tempUserResult) {
-//       const hashedPw = await bcrypt.hash(password, 12);
-//       const result = await authList.create({
-//         fname,
-//         lname,
-//         type,
-//         email,
-//         password: hashedPw,
-//       });
-
-//       const token = jwt.sign(
-//         {
-//           email,
-//           type,
-//           usetId: result._id,
-//         },
-//         "somesupersecretsecret",
-//         { expiresIn: "1h" }
-//       );
-
-//       res.status(200).send({
-//         success: true,
-//         data: { usetId: result._id, token },
-//       });
-//     } else {
-//       res.status(500).send({
-//         success: false,
-//         error: "",
-//       });
-//     }
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).send({
-//       success: false,
-//       error: e,
-//     });
-//   }
-// };
-
 module.exports.signup = async function (req, res) {
   const { fname, lname, type, email, password } = req.body;
 
@@ -214,6 +167,25 @@ module.exports.update = async function (req, res) {
     res.send({
       success: true,
       data: resp,
+    });
+  }
+};
+
+module.exports.findUser = async function (req, res) {
+  const { email } = req.params;
+
+  try {
+    const findUser = await authList.findOne({ email: email });
+
+    res.status(200).send({
+      success: true,
+      message: "Find user",
+      data: findUser,
+    });
+  } catch (e) {
+    res.status(500).send({
+      success: false,
+      error: e,
     });
   }
 };

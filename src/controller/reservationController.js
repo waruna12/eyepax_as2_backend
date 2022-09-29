@@ -95,22 +95,30 @@ module.exports.update = async function (req, res) {
     reservation_count,
   } = req.body;
 
-  const resp = await reservationModel.findById(id);
+  try {
+    const resp = await reservationModel.findById(id);
 
-  if (resp) {
-    resp.client_email = client_email;
-    resp.service_type = service_type;
-    resp.stylist_email = stylist_email;
-    resp.reservation_date = reservation_date;
-    resp.reservation_time = reservation_time;
-    resp.reservation_status = reservation_status;
-    resp.reservation_count = reservation_count;
+    if (resp) {
+      resp.client_email = client_email;
+      resp.service_type = service_type;
+      resp.stylist_email = stylist_email;
+      resp.reservation_date = reservation_date;
+      resp.reservation_time = reservation_time;
+      resp.reservation_status = reservation_status;
+      resp.reservation_count = reservation_count;
 
-    await resp.save();
+      await resp.save();
 
-    res.send({
-      success: true,
-      data: resp,
+      res.status(201).send({
+        success: true,
+        message: "Reservation updated",
+        data: resp,
+      });
+    }
+  } catch (e) {
+    res.status(500).send({
+      success: false,
+      error: e,
     });
   }
 };

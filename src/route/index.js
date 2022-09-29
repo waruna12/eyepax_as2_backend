@@ -21,21 +21,24 @@ router.get("/invite-user/:email", async function (req, res) {
   await signupController.inviteUser(req, res);
 });
 
+router.get("/find-user/:email", async function (req, res) {
+  await signupController.findUser(req, res);
+});
+
 router.put("/user/:id/:newPassword", async function (req, res) {
   await signupController.update(req, res);
 });
 
-//client route
 router.post("/client", async function (req, res) {
   await clientController.create(req, res);
 });
 
-router.get("/client", async function (req, res) {
-  await clientController.getall(req, res);
-});
-
 router.get("/client/:id", async function (req, res) {
   await clientController.get(req, res);
+});
+
+router.get("/client", async function (req, res) {
+  await clientController.getall(req, res);
 });
 
 router.put("/client/:id/:client_email", async function (req, res) {
@@ -50,7 +53,7 @@ router.get("/client/search/:key", async function (req, res) {
   await clientController.search(req, res);
 });
 
-//reservation route'
+//reservation route
 
 router.post("/reservation", async function (req, res) {
   await reservationController.create(req, res);
