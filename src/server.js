@@ -1,4 +1,4 @@
-const express = require("express"); //import express
+const express = require("express");
 const bodyParser = require("body-parser");
 const dbConnection = require("./db/init");
 const server = express();

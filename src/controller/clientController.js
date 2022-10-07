@@ -30,7 +30,7 @@ module.exports.create = async function (req, res) {
 
 module.exports.getall = async function (req, res) {
   try {
-    const resp = await clientModel.find();
+    const resp = await clientModel.find().skip(1).limit(2);
 
     res.status(200).send({
       success: true,
@@ -72,13 +72,11 @@ module.exports.get = async function (req, res) {
 
 module.exports.update = async function (req, res) {
   const { id } = req.params;
-  const { client_email } = req.params;
-
   const { fname, lname, phone_number, email } = req.body;
 
   try {
     const reservationClient = await reservationModel.findOne({
-      client_email: client_email,
+      client_email: email,
     });
 
     if (!reservationClient) {

@@ -1,5 +1,6 @@
 const reservationModel = require("../model/reservationList");
 const authList = require("../model/authList");
+const moment = require("moment");
 
 module.exports.create = async function (req, res) {
   const {
@@ -32,18 +33,20 @@ module.exports.create = async function (req, res) {
         reservation_count,
       });
 
-      res.send({
+      res.status(200).send({
         success: true,
+        message: "Reservation create success",
         data: resp,
       });
     } else {
-      res.send({
+      res.status(500).send({
         success: false,
+        message: "Reservation duplicate",
         data: [],
       });
     }
   } catch (e) {
-    res.send({
+    res.status(500).send({
       success: false,
       error: e,
     });
@@ -51,34 +54,43 @@ module.exports.create = async function (req, res) {
 };
 
 module.exports.getall = async function (req, res) {
-  const resp = await reservationModel.find();
+  try {
+    const resp = await reservationModel.find();
 
-  if (resp) {
-    res.send({
+    res.status(200).send({
       success: true,
+      message: "Get all reservation success",
       data: resp,
     });
-  } else {
-    res.send({
+  } catch (e) {
+    res.status(500).send({
       success: false,
-      data: [],
+      error: e,
     });
   }
 };
 
 module.exports.get = async function (req, res) {
   const { id } = req.params;
-  const resp = await reservationModel.findById(id);
 
-  if (resp) {
-    res.send({
-      success: true,
-      data: resp,
-    });
-  } else {
-    res.send({
+  try {
+    const resp = await reservationModel.findById(id);
+    if (resp) {
+      res.status(200).send({
+        success: true,
+        message: "Get reservation success",
+        data: resp,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "No valid entry found for provided ID",
+      });
+    }
+  } catch (e) {
+    res.status(500).send({
       success: false,
-      data: [],
+      error: e,
     });
   }
 };
@@ -109,7 +121,7 @@ module.exports.update = async function (req, res) {
 
       await resp.save();
 
-      res.status(201).send({
+      res.status(200).send({
         success: true,
         message: "Reservation updated",
         data: resp,
@@ -159,18 +171,23 @@ module.exports.reservationSearch = async function (req, res) {
     });
 
     if (reservationSearch) {
-      res.send({
+      res.status(200).send({
         success: true,
         data: reservationSearch,
       });
     } else {
-      res.send({
+      res.status(401).send({
         success: false,
+        message: "Cannot search",
         data: [],
       });
     }
   } catch (e) {
-    res.send("Search failed");
+    res.status(500).send({
+      success: false,
+      message: "Search failed",
+      error: e,
+    });
   }
 };
 
@@ -204,7 +221,7 @@ module.exports.search = async function (req, res) {
     const unique = uniqueOne.concat(uniqueTwo);
 
     if (unique) {
-      res.send({
+      res.status(200).send({
         success: true,
         data: unique,
       });
@@ -215,7 +232,7 @@ module.exports.search = async function (req, res) {
       });
     }
   } catch (e) {
-    res.send("stylist search failed");
+    res.status(500).send("stylist search failed");
   }
 };
 
@@ -243,22 +260,48 @@ module.exports.completeReservation = async function (req, res) {
 };
 
 module.exports.eachStylistReservation = async function (req, res) {
-  const resp = await reservationModel.aggregate([
-    { $match: {} },
-    {
-      $group: { _id: "$stylist_email", value: { $sum: "$reservation_count" } },
-    },
-  ]);
+  let formatOne = "YYYY-MM-DD";
+  let curr = new Date(); // get current date
+  let first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+  let last = first + 6; // last day is the first day + 6
 
-  if (resp) {
-    res.send({
-      success: true,
-      data: resp,
-    });
-  } else {
-    res.send({
+  let firstday = new Date(curr.setDate(first)).toUTCString();
+  let lastday = new Date(curr.setDate(last)).toUTCString();
+
+  let formatFirtDate = moment(firstday).format(formatOne);
+  let formatLastDate = moment(lastday).format(formatOne);
+
+  try {
+    const resp = await reservationModel.aggregate([
+      {
+        $match: {
+          reservation_date: { $gt: formatFirtDate, $lt: formatLastDate },
+        },
+      },
+      {
+        $group: {
+          _id: "$stylist_email",
+          value: { $sum: "$reservation_count" },
+        },
+      },
+    ]);
+
+    if (resp) {
+      res.status(200).send({
+        success: true,
+        data: resp,
+      });
+    } else {
+      res.status(400).send({
+        success: false,
+        data: [],
+      });
+    }
+  } catch (e) {
+    res.status(500).send({
       success: false,
-      data: [],
+      message: "Failed",
+      error: e,
     });
   }
 };

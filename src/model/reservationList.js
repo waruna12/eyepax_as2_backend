@@ -6,31 +6,31 @@ const reservationList = mongoose.model(
     {
       client_email: {
         type: String,
-        required: true,
+        required: [true, "Client is required"],
       },
       service_type: {
         type: String,
-        required: true,
+        required: [true, "Service type is required"],
       },
       stylist_email: {
         type: String,
-        required: true,
+        required: [true, "Stylist is required"],
       },
       reservation_date: {
         type: String,
-        required: true,
+        required: [true, "Reservation date is required"],
       },
       reservation_time: {
         type: String,
-        required: true,
+        required: [true, "Reservation time is required"],
       },
       reservation_status: {
         type: String,
-        required: true,
+        required: [true, "Reservation status is required"],
       },
       reservation_count: {
         type: Number,
-        required: true,
+        required: [true, "Reservation count is required"],
       },
     },
     { timestamps: true }

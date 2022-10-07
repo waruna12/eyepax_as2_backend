@@ -1,5 +1,3 @@
-console.log("init.js waruna");
-
 const mongoose = require("mongoose");
 require("dotenv").config();
 

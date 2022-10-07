@@ -4,7 +4,6 @@ const clientList = mongoose.model(
   "client",
   new mongoose.Schema(
     {
-      //table name"client"
       fname: {
         type: String,
         required: [true, "First name is required"],
