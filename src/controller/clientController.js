@@ -2,7 +2,7 @@ const clientModel = require("../model/clientList");
 const reservationModel = require("../model/reservationList");
 const errorHandler = require("../utill/errorHandler");
 
-module.exports.create = async function (req, res) {
+module.exports.clientCreate = async function (req, res) {
   const { fname, lname, phone_number, email } = req.body;
 
   try {
@@ -28,32 +28,33 @@ module.exports.create = async function (req, res) {
   }
 };
 
-module.exports.getall = async function (req, res) {
+module.exports.ClientGetAll = async function (req, res) {
   try {
-    const resp = await clientModel.find().skip(1).limit(2);
+    const resp = await clientModel.find();
 
     res.status(200).send({
       success: true,
-      message: "Get all clients success",
+      message: "Get all clients",
       data: resp,
     });
   } catch (e) {
     res.status(500).send({
       success: false,
+      message: "Can not get clients",
       error: e,
     });
   }
 };
 
-module.exports.get = async function (req, res) {
-  const { id } = req.params;
+module.exports.clientGetById = async function (req, res) {
+  const { clientId } = req.params;
 
   try {
-    const resp = await clientModel.findById(id);
+    const resp = await clientModel.findById(clientId);
     if (resp) {
       res.status(200).send({
         success: true,
-        message: "Get client success",
+        message: "Client get success",
         data: resp,
       });
     } else {
@@ -65,13 +66,14 @@ module.exports.get = async function (req, res) {
   } catch (e) {
     res.status(500).send({
       success: false,
+      message: "Can not get client",
       error: e,
     });
   }
 };
 
-module.exports.update = async function (req, res) {
-  const { id } = req.params;
+module.exports.clientUpdate = async function (req, res) {
+  const { clientId } = req.params;
   const { fname, lname, phone_number, email } = req.body;
 
   try {
@@ -80,7 +82,7 @@ module.exports.update = async function (req, res) {
     });
 
     if (!reservationClient) {
-      const resp = await clientModel.findById(id);
+      const resp = await clientModel.findById(clientId);
 
       if (resp) {
         resp.fname = fname;
@@ -97,7 +99,7 @@ module.exports.update = async function (req, res) {
         });
       }
     } else {
-      res.status(401).send({
+      res.status(400).send({
         success: false,
         message: "Cannot update, Already have an appointment",
         error: "Can not update",
@@ -114,8 +116,8 @@ module.exports.update = async function (req, res) {
   }
 };
 
-module.exports.delete = async function (req, res) {
-  const { id: _id } = req.params;
+module.exports.clientDelete = async function (req, res) {
+  const { clientId: _id } = req.params;
   const { email } = req.body;
 
   try {
@@ -135,13 +137,13 @@ module.exports.delete = async function (req, res) {
             },
           });
         } else {
-          res.status(404).send({
+          res.status(400).send({
             success: false,
             message: "No valid entry found for provided ID",
           });
         }
       } else {
-        res.status(401).send({
+        res.status(400).send({
           success: false,
           message: "Cannot delete, Already have an appointment",
           error: "Can not delete",
@@ -157,12 +159,13 @@ module.exports.delete = async function (req, res) {
   } catch (e) {
     res.status(500).send({
       success: false,
+      message: "Validation failed",
       error: e,
     });
   }
 };
 
-module.exports.search = async function (req, res) {
+module.exports.Clientsearch = async function (req, res) {
   const { key } = req.params;
 
   try {

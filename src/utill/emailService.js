@@ -17,16 +17,16 @@ module.exports.sendEmail = async function (email, token) {
   let transporter = nodemailer.createTransport({
     service: "hotmail",
     port: 587,
-    secure: false, // true for 465, false for other ports
+    secure: false, // true for 587, false for other ports
     auth: {
-      user: process.env.EMAIL, // generated ethereal user smyp
-      pass: process.env.PASSWORD, // generated ethereal password
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
     },
   });
 
   await transporter.sendMail({
     from: process.env.EMAIL,
-    to: email, // list of receivers
+    to: email,
     subject: "Invite User",
     html: htmlToSend,
   });

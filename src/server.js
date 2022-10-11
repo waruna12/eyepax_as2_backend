@@ -5,6 +5,9 @@ const server = express();
 const cors = require("cors");
 
 const router = require("./route");
+const clientRouter = require("./route/client");
+const reservationRouter = require("./route/reservation");
+const adminRouter = require("./route/admin");
 
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
@@ -17,7 +20,11 @@ server.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   next();
 });
-server.use("/api", router); //wildcard(api/use postman)
+
+server.use("/api", router);
+server.use("/api/user", adminRouter);
+server.use("/api/client", clientRouter);
+server.use("/api/reservation", reservationRouter);
 
 dbConnection();
 
