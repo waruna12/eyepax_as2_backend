@@ -18,13 +18,8 @@ module.exports.clientCreate = async function (req, res) {
       data: resp,
     });
   } catch (e) {
-    const error = await errorHandler.validationError(e);
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      case: "VALIDATION_ERROR",
-      error: error,
-    });
+    const error = await errorHandler.validationError(e, res);
+    return error;
   }
 };
 
@@ -38,11 +33,8 @@ module.exports.ClientGetAll = async function (req, res) {
       data: resp,
     });
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Can not get clients",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -58,17 +50,13 @@ module.exports.clientGetById = async function (req, res) {
         data: resp,
       });
     } else {
-      res.status(404).send({
-        success: false,
-        message: "No valid entry found for provided ID",
-      });
+      const error = new Error("No valid entry found for provided ID");
+      error.statusCode = 404;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Can not get client",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -106,13 +94,8 @@ module.exports.clientUpdate = async function (req, res) {
       });
     }
   } catch (e) {
-    const error = await errorHandler.validationError(e);
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      case: "VALIDATION_ERROR",
-      error: error,
-    });
+    const error = await errorHandler.validationError(e, res);
+    return error;
   }
 };
 
@@ -137,31 +120,23 @@ module.exports.clientDelete = async function (req, res) {
             },
           });
         } else {
-          res.status(400).send({
-            success: false,
-            message: "No valid entry found for provided ID",
-          });
+          const error = new Error("No valid entry found for provided ID");
+          error.statusCode = 400;
+          throw error;
         }
       } else {
-        res.status(400).send({
-          success: false,
-          message: "Cannot delete, Already have an appointment",
-          error: "Can not delete",
-        });
+        const error = new Error("Cannot delete, Already have an appointment");
+        error.statusCode = 400;
+        throw error;
       }
     } else {
-      res.status(500).send({
-        success: false,
-        message: "Email is required",
-        error: "Email is required",
-      });
+      const error = new Error("Email is required");
+      error.statusCode = 500;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -179,16 +154,12 @@ module.exports.Clientsearch = async function (req, res) {
         data: clientSearch,
       });
     } else {
-      res.status(401).send({
-        success: false,
-        message: "Cannot search",
-        error: "Can not search",
-      });
+      const error = new Error("Cannot search");
+      error.statusCode = 400;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };

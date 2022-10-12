@@ -11,12 +11,12 @@ router.get("/search/:key", async function (req, res) {
   await clientController.Clientsearch(req, res);
 });
 
-router.get("/:clientId", async function (req, res) {
-  await clientController.clientGetById(req, res);
+router.get("/getAllClients", async function (req, res) {
+  await clientController.ClientGetAll(req, res);
 });
 
-router.get("/", async function (req, res) {
-  await clientController.ClientGetAll(req, res);
+router.get("/:clientId", async function (req, res) {
+  await clientController.clientGetById(req, res);
 });
 
 router.put("/:clientId", async function (req, res) {

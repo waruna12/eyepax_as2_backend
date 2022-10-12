@@ -13,44 +13,47 @@ module.exports.getallUsers = async function (req, res) {
         data: resp,
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "Can not get users",
-        data: [],
-      });
+      const error = new Error("Can not get users");
+      error.statusCode = 404;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
 module.exports.passwordUpdate = async function (req, res) {
   const { userId } = req.params;
-  // const { newPassword } = req.body;
-  const { newPassword } = req.params;
+  const { newPassword } = req.body;
 
-  const resp = await authList.findById(userId);
+  try {
+    const resp = await authList.findById(userId);
 
-  const hashedPw = await bcrypt.hash(newPassword, 12);
+    const hashedPw = await bcrypt.hash(newPassword, 12);
 
-  if (resp) {
-    resp.password = hashedPw;
-    await resp.save();
+    if (resp) {
+      resp.password = hashedPw;
+      await resp.save();
 
-    res.send({
-      success: true,
-      data: resp,
-    });
+      res.status(200).send({
+        success: true,
+        message: "Success change password",
+        data: resp,
+      });
+    } else {
+      const error = new Error("No valid entry found for provided ID");
+      error.statusCode = 404;
+      throw error;
+    }
+  } catch (e) {
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
 module.exports.findUser = async function (req, res) {
   const { email } = req.params;
-
   try {
     const findUser = await authList.findOne({ email: email });
 
@@ -60,11 +63,8 @@ module.exports.findUser = async function (req, res) {
       data: findUser,
     });
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "User not found",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -83,18 +83,13 @@ module.exports.userSearch = async function (req, res) {
         data: userSearch,
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "Cannot search",
-        error: "Can not search",
-      });
+      const error = new Error("Cannot search");
+      error.statusCode = 400;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -119,13 +114,8 @@ module.exports.profileUpdate = async function (req, res) {
       });
     }
   } catch (e) {
-    const error = await errorHandler.validationError(e);
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      case: "VALIDATION_ERROR",
-      error: error,
-    });
+    const error = await errorHandler.validationError(e, res);
+    return error;
   }
 };
 
@@ -141,16 +131,12 @@ module.exports.userGetID = async function (req, res) {
         data: resp,
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "No valid entry found for provided ID",
-      });
+      const error = new Error("No valid entry found for provided ID");
+      error.statusCode = 400;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };

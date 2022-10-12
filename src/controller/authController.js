@@ -7,7 +7,6 @@ const errorHandler = require("../utill/errorHandler");
 
 module.exports.signup = async function (req, res) {
   const { fname, lname, type, email, password } = req.body;
-
   const tempToken = req.params.token;
 
   try {
@@ -39,20 +38,15 @@ module.exports.signup = async function (req, res) {
         data: { usetId: result._id, token },
       });
     } else {
-      res.status(500).send({
+      res.status(400).send({
         success: false,
         message: "Invalid token",
         error: "Invalid token",
       });
     }
   } catch (e) {
-    const error = await errorHandler.validationError(e);
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      case: "VALIDATION_ERROR",
-      error: error,
-    });
+    const error = await errorHandler.validationError(e, res);
+    return error;
   }
 };
 
@@ -87,13 +81,12 @@ module.exports.login = async function (req, res) {
 
     res.status(200).send({
       success: true,
+      message: "Login success",
       data: { usetId: user._id, token },
     });
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 

@@ -33,7 +33,7 @@ module.exports.reservationCreate = async function (req, res) {
         reservation_count,
       });
 
-      res.status(200).send({
+      res.status(201).send({
         success: true,
         message: "Reservation create success",
         data: resp,
@@ -46,13 +46,8 @@ module.exports.reservationCreate = async function (req, res) {
       });
     }
   } catch (e) {
-    const error = await errorHandler.validationError(e);
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      case: "VALIDATION_ERROR",
-      error: error,
-    });
+    const error = await errorHandler.validationError(e, res);
+    return error;
   }
 };
 
@@ -66,11 +61,8 @@ module.exports.getAllReservation = async function (req, res) {
       data: resp,
     });
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Can not get reservations",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -86,17 +78,13 @@ module.exports.getReservationById = async function (req, res) {
         data: resp,
       });
     } else {
-      res.status(404).send({
-        success: false,
-        message: "No valid entry found for provided ID",
-      });
+      const error = new Error("No valid entry found for provided ID");
+      error.statusCode = 404;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -132,11 +120,8 @@ module.exports.reservationUpdate = async function (req, res) {
       });
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -155,17 +140,13 @@ module.exports.reservationDelete = async function (req, res) {
         },
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "No valid entry found for provided ID",
-      });
+      const error = new Error("No valid entry found for provided ID");
+      error.statusCode = 404;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -182,18 +163,13 @@ module.exports.reservationSearch = async function (req, res) {
         data: reservationSearch,
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "Cannot search",
-        data: [],
-      });
+      const error = new Error("Cannot search");
+      error.statusCode = 400;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Search failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -233,18 +209,13 @@ module.exports.stylistSearch = async function (req, res) {
         data: uniqueResponse,
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "Can not search stylist",
-        data: [],
-      });
+      const error = new Error("Can not search stylist");
+      error.statusCode = 400;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -262,18 +233,13 @@ module.exports.completeReservation = async function (req, res) {
         data: completeReservation,
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "Failed get complete reservationn",
-        data: [],
-      });
+      const error = new Error("Failed get complete reservation");
+      error.statusCode = 400;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 
@@ -311,18 +277,13 @@ module.exports.eachStylistReservationPerWeek = async function (req, res) {
         data: resp,
       });
     } else {
-      res.status(400).send({
-        success: false,
-        message: "Failed get stylist",
-        data: [],
-      });
+      const error = new Error("Failed get stylist");
+      error.statusCode = 400;
+      throw error;
     }
   } catch (e) {
-    res.status(500).send({
-      success: false,
-      message: "Validation failed",
-      error: e,
-    });
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };
 

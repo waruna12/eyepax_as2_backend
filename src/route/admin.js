@@ -3,12 +3,12 @@ const adminController = require("../controller/adminController");
 
 const router = express.Router();
 
-router.get("/search/:key", async function (req, res) {
-  await adminController.userSearch(req, res);
+router.get("/signUp/findUser/:email", async function (req, res) {
+  await adminController.findUser(req, res);
 });
 
-router.get("/find/:email", async function (req, res) {
-  await adminController.findUser(req, res);
+router.get("/search/:key", async function (req, res) {
+  await adminController.userSearch(req, res);
 });
 
 router.get("/:userId", async function (req, res) {
@@ -19,11 +19,11 @@ router.get("/", async function (req, res) {
   await adminController.getallUsers(req, res);
 });
 
-router.put("/:userId/:newPassword", async function (req, res) {
+router.put("/changePassword/:userId", async function (req, res) {
   await adminController.passwordUpdate(req, res);
 });
 
-router.put("/:userId", async function (req, res) {
+router.put("/profileUpdate/:userId", async function (req, res) {
   await adminController.profileUpdate(req, res);
 });
 
