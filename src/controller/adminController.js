@@ -2,10 +2,16 @@ const authList = require("../model/authList");
 const bcrypt = require("bcryptjs");
 const errorHandler = require("../utill/errorHandler");
 
-module.exports.getallUsers = async function (req, res) {
-  const resp = await authList.find();
+module.exports.getAllUsers = async function (req, res) {
+  const { skip } = req.params;
+  const { limit } = req.params;
 
   try {
+    const resp = await authList
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ fname: "asc" });
     if (resp) {
       res.status(200).send({
         success: true,
@@ -23,7 +29,7 @@ module.exports.getallUsers = async function (req, res) {
   }
 };
 
-module.exports.passwordUpdate = async function (req, res) {
+module.exports.updateUserPassword = async function (req, res) {
   const { userId } = req.params;
   const { newPassword } = req.body;
 
@@ -38,7 +44,7 @@ module.exports.passwordUpdate = async function (req, res) {
 
       res.status(200).send({
         success: true,
-        message: "Success change password",
+        message: "User password updated",
         data: resp,
       });
     } else {
@@ -68,7 +74,7 @@ module.exports.findUser = async function (req, res) {
   }
 };
 
-module.exports.userSearch = async function (req, res) {
+module.exports.searchUser = async function (req, res) {
   const { key } = req.params;
 
   try {
@@ -93,10 +99,9 @@ module.exports.userSearch = async function (req, res) {
   }
 };
 
-module.exports.profileUpdate = async function (req, res) {
+module.exports.updateUserProfile = async function (req, res) {
   const { userId } = req.params;
   const { email, fname, lname } = req.body;
-
   try {
     const resp = await authList.findById(userId);
 
@@ -109,7 +114,7 @@ module.exports.profileUpdate = async function (req, res) {
 
       res.status(200).send({
         success: true,
-        message: "profile update success",
+        message: "User profile updated",
         data: resp,
       });
     }
@@ -119,7 +124,7 @@ module.exports.profileUpdate = async function (req, res) {
   }
 };
 
-module.exports.userGetID = async function (req, res) {
+module.exports.getUserByID = async function (req, res) {
   const { userId } = req.params;
 
   try {
@@ -127,7 +132,7 @@ module.exports.userGetID = async function (req, res) {
     if (resp) {
       res.status(200).send({
         success: true,
-        message: "Get user success",
+        message: "Get user",
         data: resp,
       });
     } else {

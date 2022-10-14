@@ -4,23 +4,23 @@ const reservationController = require("../controller/reservationController");
 const router = express.Router();
 
 router.post("/", async function (req, res) {
-  await reservationController.reservationCreate(req, res);
+  await reservationController.createReservation(req, res);
 });
 
 router.get("/stylistSearch/:date/:time", async function (req, res) {
-  await reservationController.stylistSearch(req, res);
+  await reservationController.searchStylist(req, res);
 });
 
 router.get("/search/:key", async function (req, res) {
-  await reservationController.reservationSearch(req, res);
+  await reservationController.searchReservation(req, res);
 });
 
 router.get("/find/:key", async function (req, res) {
-  await reservationController.completeReservation(req, res);
+  await reservationController.getAllCompleteReservation(req, res);
 });
 
 router.get("/stylist", async function (req, res) {
-  await reservationController.eachStylistReservationPerWeek(req, res);
+  await reservationController.getEachStylistReservationPerWeek(req, res);
 });
 
 router.get("/:reservationId", async function (req, res) {
@@ -39,11 +39,11 @@ router.put(
 );
 
 router.put("/:reservationId", async function (req, res) {
-  await reservationController.reservationUpdate(req, res);
+  await reservationController.updateReservation(req, res);
 });
 
 router.delete("/:reservationId", async function (req, res) {
-  await reservationController.reservationDelete(req, res);
+  await reservationController.deleteReservation(req, res);
 });
 
 module.exports = router;

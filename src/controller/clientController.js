@@ -2,7 +2,7 @@ const clientModel = require("../model/clientList");
 const reservationModel = require("../model/reservationList");
 const errorHandler = require("../utill/errorHandler");
 
-module.exports.clientCreate = async function (req, res) {
+module.exports.createClient = async function (req, res) {
   const { fname, lname, phone_number, email } = req.body;
 
   try {
@@ -14,7 +14,7 @@ module.exports.clientCreate = async function (req, res) {
     });
     res.status(201).send({
       success: true,
-      message: "Client create success",
+      message: "Client created",
       data: resp,
     });
   } catch (e) {
@@ -23,9 +23,16 @@ module.exports.clientCreate = async function (req, res) {
   }
 };
 
-module.exports.ClientGetAll = async function (req, res) {
+module.exports.getAllClient = async function (req, res) {
+  const { skip } = req.params;
+  const { limit } = req.params;
+
   try {
-    const resp = await clientModel.find();
+    const resp = await clientModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ fname: "asc" });
 
     res.status(200).send({
       success: true,
@@ -38,7 +45,7 @@ module.exports.ClientGetAll = async function (req, res) {
   }
 };
 
-module.exports.clientGetById = async function (req, res) {
+module.exports.getClientById = async function (req, res) {
   const { clientId } = req.params;
 
   try {
@@ -46,7 +53,7 @@ module.exports.clientGetById = async function (req, res) {
     if (resp) {
       res.status(200).send({
         success: true,
-        message: "Client get success",
+        message: "Get client",
         data: resp,
       });
     } else {
@@ -60,7 +67,7 @@ module.exports.clientGetById = async function (req, res) {
   }
 };
 
-module.exports.clientUpdate = async function (req, res) {
+module.exports.updateClient = async function (req, res) {
   const { clientId } = req.params;
   const { fname, lname, phone_number, email } = req.body;
 
@@ -82,7 +89,7 @@ module.exports.clientUpdate = async function (req, res) {
 
         res.status(200).send({
           success: true,
-          message: "Client update success",
+          message: "Client updated",
           data: resp,
         });
       }
@@ -90,7 +97,7 @@ module.exports.clientUpdate = async function (req, res) {
       res.status(400).send({
         success: false,
         message: "Cannot update, Already have an appointment",
-        error: "Can not update",
+        error: "Cannot update",
       });
     }
   } catch (e) {
@@ -99,7 +106,7 @@ module.exports.clientUpdate = async function (req, res) {
   }
 };
 
-module.exports.clientDelete = async function (req, res) {
+module.exports.deleteClient = async function (req, res) {
   const { clientId: _id } = req.params;
   const { email } = req.body;
 
@@ -114,7 +121,7 @@ module.exports.clientDelete = async function (req, res) {
         if (resp.deletedCount > 0) {
           res.status(200).send({
             success: true,
-            message: "Client delete success",
+            message: "Client deleted",
             data: {
               id: _id,
             },
@@ -140,7 +147,7 @@ module.exports.clientDelete = async function (req, res) {
   }
 };
 
-module.exports.Clientsearch = async function (req, res) {
+module.exports.searchClient = async function (req, res) {
   const { key } = req.params;
 
   try {
@@ -151,6 +158,7 @@ module.exports.Clientsearch = async function (req, res) {
     if (clientSearch) {
       res.status(200).send({
         success: true,
+        message: "Search client",
         data: clientSearch,
       });
     } else {

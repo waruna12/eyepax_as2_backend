@@ -3,7 +3,7 @@ const authList = require("../model/authList");
 const moment = require("moment");
 const errorHandler = require("../utill/errorHandler");
 
-module.exports.reservationCreate = async function (req, res) {
+module.exports.createReservation = async function (req, res) {
   const {
     client_email,
     service_type,
@@ -35,7 +35,7 @@ module.exports.reservationCreate = async function (req, res) {
 
       res.status(201).send({
         success: true,
-        message: "Reservation create success",
+        message: "Reservation created",
         data: resp,
       });
     } else {
@@ -74,7 +74,7 @@ module.exports.getReservationById = async function (req, res) {
     if (resp) {
       res.status(200).send({
         success: true,
-        message: "Get reservation success",
+        message: "Get reservation",
         data: resp,
       });
     } else {
@@ -88,7 +88,7 @@ module.exports.getReservationById = async function (req, res) {
   }
 };
 
-module.exports.reservationUpdate = async function (req, res) {
+module.exports.updateReservation = async function (req, res) {
   const { reservationId } = req.params;
   const {
     client_email,
@@ -125,7 +125,7 @@ module.exports.reservationUpdate = async function (req, res) {
   }
 };
 
-module.exports.reservationDelete = async function (req, res) {
+module.exports.deleteReservation = async function (req, res) {
   const { reservationId: _id } = req.params;
 
   try {
@@ -134,7 +134,7 @@ module.exports.reservationDelete = async function (req, res) {
     if (resp.deletedCount > 0) {
       res.status(200).send({
         success: true,
-        message: "Reservation delete success",
+        message: "Reservation deleted",
         data: {
           id: _id,
         },
@@ -150,7 +150,7 @@ module.exports.reservationDelete = async function (req, res) {
   }
 };
 
-module.exports.reservationSearch = async function (req, res) {
+module.exports.searchReservation = async function (req, res) {
   const { key } = req.params;
   try {
     const reservationSearch = await reservationModel.find({
@@ -160,10 +160,11 @@ module.exports.reservationSearch = async function (req, res) {
     if (reservationSearch) {
       res.status(200).send({
         success: true,
+        message: "Search reservation",
         data: reservationSearch,
       });
     } else {
-      const error = new Error("Cannot search");
+      const error = new Error("Cannot search reservation");
       error.statusCode = 400;
       throw error;
     }
@@ -173,7 +174,7 @@ module.exports.reservationSearch = async function (req, res) {
   }
 };
 
-module.exports.stylistSearch = async function (req, res) {
+module.exports.searchStylist = async function (req, res) {
   const { date, time } = req.params;
 
   const styalist = [];
@@ -205,11 +206,11 @@ module.exports.stylistSearch = async function (req, res) {
     if (uniqueResponse) {
       res.status(200).send({
         success: true,
-        message: "Success search stylist",
+        message: "Search stylist",
         data: uniqueResponse,
       });
     } else {
-      const error = new Error("Can not search stylist");
+      const error = new Error("Cannot search stylist");
       error.statusCode = 400;
       throw error;
     }
@@ -219,7 +220,7 @@ module.exports.stylistSearch = async function (req, res) {
   }
 };
 
-module.exports.completeReservation = async function (req, res) {
+module.exports.getAllCompleteReservation = async function (req, res) {
   const { key } = req.params;
   try {
     const completeReservation = await reservationModel.find({
@@ -229,11 +230,11 @@ module.exports.completeReservation = async function (req, res) {
     if (completeReservation) {
       res.status(200).send({
         success: true,
-        message: "Success get complete reservation",
+        message: "Get complete reservations",
         data: completeReservation,
       });
     } else {
-      const error = new Error("Failed get complete reservation");
+      const error = new Error("Cannot get complete reservation");
       error.statusCode = 400;
       throw error;
     }
@@ -243,7 +244,7 @@ module.exports.completeReservation = async function (req, res) {
   }
 };
 
-module.exports.eachStylistReservationPerWeek = async function (req, res) {
+module.exports.getEachStylistReservationPerWeek = async function (req, res) {
   let Dateformat = "YYYY-MM-DD";
   let currentDate = new Date(); // get current date
   let first = currentDate.getDate() - currentDate.getDay(); // First day is the day of the month - the day of the week
@@ -327,7 +328,7 @@ module.exports.updateDragReservation = async function (req, res) {
 
         res.status(200).send({
           success: true,
-          message: "Reservation updated success",
+          message: "Reservation updated",
           data: resp,
         });
       }

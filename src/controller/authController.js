@@ -5,7 +5,7 @@ const emailService = require("../utill/emailService");
 const tempUser = require("../model/tempUser");
 const errorHandler = require("../utill/errorHandler");
 
-module.exports.signup = async function (req, res) {
+module.exports.signUpUser = async function (req, res) {
   const { fname, lname, type, email, password } = req.body;
   const tempToken = req.params.token;
 
@@ -21,7 +21,6 @@ module.exports.signup = async function (req, res) {
         email,
         password: hashedPw,
       });
-
       const token = jwt.sign(
         {
           email,
@@ -34,7 +33,7 @@ module.exports.signup = async function (req, res) {
 
       res.status(200).send({
         success: true,
-        message: "Create new user",
+        message: "User created",
         data: { usetId: result._id, token },
       });
     } else {
@@ -50,7 +49,7 @@ module.exports.signup = async function (req, res) {
   }
 };
 
-module.exports.login = async function (req, res) {
+module.exports.loginUser = async function (req, res) {
   const { email, password } = req.body;
 
   try {
@@ -81,7 +80,7 @@ module.exports.login = async function (req, res) {
 
     res.status(200).send({
       success: true,
-      message: "Login success",
+      message: "User logged",
       data: { usetId: user._id, token },
     });
   } catch (e) {
@@ -121,7 +120,7 @@ module.exports.inviteUser = async function (req, res) {
       } catch (e) {
         res.status(500).send({
           success: false,
-          message: "Email sending failed",
+          message: "Sending email failed",
           error: e,
         });
       }
