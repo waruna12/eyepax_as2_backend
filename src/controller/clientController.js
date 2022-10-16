@@ -27,12 +27,15 @@ module.exports.getAllClient = async function (req, res) {
   const { skip } = req.params;
   const { limit } = req.params;
 
+  const sort = {};
+
+  if (req.query.sortBy) {
+    const str = req.query.sortBy.split(":");
+    sort[str[0]] = str[1] === "desc" ? -1 : 1;
+  }
+
   try {
-    const resp = await clientModel
-      .find()
-      .skip(skip)
-      .limit(limit)
-      .sort({ fname: "asc" });
+    const resp = await clientModel.find().skip(skip).limit(limit).sort(sort);
 
     res.status(200).send({
       success: true,

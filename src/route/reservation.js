@@ -32,7 +32,7 @@ router.get("/", async function (req, res) {
 });
 
 router.put(
-  "/dragReservation/:reservationId/:date/:time/:email",
+  "/dragReservation/:reservationId/:date/:time/:stylist",
   async function (req, res) {
     await reservationController.updateDragReservation(req, res);
   }

@@ -292,7 +292,7 @@ module.exports.updateDragReservation = async function (req, res) {
   const { reservationId } = req.params;
   const { date } = req.params;
   const { time } = req.params;
-  const { email } = req.params;
+  const { stylist } = req.params;
 
   const { client_email, service_type, reservation_status, reservation_count } =
     req.body;
@@ -302,7 +302,7 @@ module.exports.updateDragReservation = async function (req, res) {
       $and: [
         { reservation_date: { $regex: date } },
         { reservation_time: { $regex: time } },
-        { stylist_email: { $regex: email } },
+        { stylist_email: { $regex: stylist } },
       ],
     });
 
@@ -318,7 +318,7 @@ module.exports.updateDragReservation = async function (req, res) {
       if (resp) {
         resp.client_email = client_email;
         resp.service_type = service_type;
-        resp.stylist_email = email;
+        resp.stylist_email = stylist;
         resp.reservation_date = date;
         resp.reservation_time = time;
         resp.reservation_status = reservation_status;

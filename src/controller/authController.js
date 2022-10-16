@@ -92,21 +92,21 @@ module.exports.loginUser = async function (req, res) {
 module.exports.inviteUser = async function (req, res) {
   const { email } = req.body;
 
-  if (email != undefined) {
-    const tempUserResult = await tempUser.findOne({ email: email });
+  try {
+    if (email != undefined) {
+      const tempUserResult = await tempUser.findOne({ email: email });
 
-    if (!tempUserResult) {
-      const token = jwt.sign(
-        {
-          email,
-        },
-        "somesupersecretsecret",
-        { expiresIn: "1h" }
-      );
+      if (!tempUserResult) {
+        const token = jwt.sign(
+          {
+            email,
+          },
+          "somesupersecretsecret",
+          { expiresIn: "1h" }
+        );
 
-      await emailService.sendEmail(email, token);
+        await emailService.sendEmail(email, token);
 
-      try {
         const resp = await tempUser.create({
           email,
           token,
@@ -117,27 +117,18 @@ module.exports.inviteUser = async function (req, res) {
           message: "Send email",
           data: resp,
         });
-      } catch (e) {
-        res.status(500).send({
-          success: false,
-          message: "Sending email failed",
-          error: e,
-        });
+      } else {
+        const error = new Error("Alredy invite");
+        error.statusCode = 400;
+        throw error;
       }
     } else {
-      res.status(400).send({
-        success: false,
-        message: "Alredy invite",
-        case: "VALIDATION_ERROR",
-        error: "Duplicate email",
-      });
+      const error = new Error("Email is required");
+      error.statusCode = 400;
+      throw error;
     }
-  } else {
-    res.status(400).send({
-      success: false,
-      message: "Email is required",
-      case: "VALIDATION_ERROR",
-      error: "Email required",
-    });
+  } catch (e) {
+    const error = await errorHandler.validatuionAllError(res, e);
+    return error;
   }
 };

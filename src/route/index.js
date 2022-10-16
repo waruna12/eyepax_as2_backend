@@ -3,7 +3,7 @@ const signupController = require("../controller/authController");
 
 const router = express.Router();
 
-router.post("/signup/:token", async function (req, res) {
+router.post("/signUp/:token", async function (req, res) {
   await signupController.signUpUser(req, res);
 });
 
