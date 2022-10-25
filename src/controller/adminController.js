@@ -21,14 +21,9 @@ module.exports.getAllUsers = async function (req, res) {
         message: "Get all users",
         data: resp,
       });
-    } else {
-      const error = new Error("Can not get users");
-      error.statusCode = 404;
-      throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -56,8 +51,7 @@ module.exports.updateUserPassword = async function (req, res) {
       throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -72,8 +66,7 @@ module.exports.findUser = async function (req, res) {
       data: findUser,
     });
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -91,14 +84,9 @@ module.exports.searchUser = async function (req, res) {
         message: "Search user",
         data: userSearch,
       });
-    } else {
-      const error = new Error("Cannot search");
-      error.statusCode = 400;
-      throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -122,8 +110,7 @@ module.exports.updateUserProfile = async function (req, res) {
       });
     }
   } catch (e) {
-    const error = await errorHandler.validationError(e, res);
-    return error;
+    await errorHandler.validationError(e, res);
   }
 };
 
@@ -144,7 +131,6 @@ module.exports.getUserByID = async function (req, res) {
       throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };

@@ -44,8 +44,7 @@ module.exports.signUpUser = async function (req, res) {
       });
     }
   } catch (e) {
-    const error = await errorHandler.validationError(e, res);
-    return error;
+    await errorHandler.validationError(e, res);
   }
 };
 
@@ -84,8 +83,7 @@ module.exports.loginUser = async function (req, res) {
       data: { usetId: user._id, token },
     });
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -128,7 +126,6 @@ module.exports.inviteUser = async function (req, res) {
       throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };

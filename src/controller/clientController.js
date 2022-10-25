@@ -18,8 +18,7 @@ module.exports.createClient = async function (req, res) {
       data: resp,
     });
   } catch (e) {
-    const error = await errorHandler.validationError(e, res);
-    return error;
+    await errorHandler.validationError(e, res);
   }
 };
 
@@ -37,14 +36,18 @@ module.exports.getAllClient = async function (req, res) {
   try {
     const resp = await clientModel.find().skip(skip).limit(limit).sort(sort);
 
-    res.status(200).send({
-      success: true,
-      message: "Get all clients",
-      data: resp,
+    var query = clientModel.find();
+
+    query.count(function (err, count) {
+      res.status(200).send({
+        success: true,
+        message: "Get all clients",
+        clientCount: count,
+        data: resp,
+      });
     });
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -65,8 +68,7 @@ module.exports.getClientById = async function (req, res) {
       throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -104,8 +106,7 @@ module.exports.updateClient = async function (req, res) {
       });
     }
   } catch (e) {
-    const error = await errorHandler.validationError(e, res);
-    return error;
+    await errorHandler.validationError(e, res);
   }
 };
 
@@ -145,8 +146,7 @@ module.exports.deleteClient = async function (req, res) {
       throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
 
@@ -162,15 +162,11 @@ module.exports.searchClient = async function (req, res) {
       res.status(200).send({
         success: true,
         message: "Search client",
+        clientCount: clientSearch.length,
         data: clientSearch,
       });
-    } else {
-      const error = new Error("Cannot search");
-      error.statusCode = 400;
-      throw error;
     }
   } catch (e) {
-    const error = await errorHandler.validatuionAllError(res, e);
-    return error;
+    await errorHandler.validatuionAllError(res, e);
   }
 };
